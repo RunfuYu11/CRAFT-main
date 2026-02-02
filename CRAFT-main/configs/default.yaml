@@ -1,0 +1,66 @@
+# v4/configs/default.yaml
+# 基础路径
+data:
+  train_dir: /media/aita4090/YRF/CRAFT-main/v5/data/train
+  valid_dir: /media/aita4090/YRF/CRAFT-main/v5/data/valid
+  src_train: /media/aita4090/YRF/CRAFT-main/v5/data/train/src_train.txt
+  tgt_train: /media/aita4090/YRF/CRAFT-main/v5/data/train/tgt_train.txt
+  enc_train: /media/aita4090/YRF/CRAFT-main/v5/data/train/encoder_input.npz     # 也支持 .npz
+  src_valid: /media/aita4090/YRF/CRAFT-main/v5/data/valid/src_valid.txt
+  tgt_valid: /media/aita4090/YRF/CRAFT-main/v5/data/valid/tgt_valid.txt
+  enc_valid: /media/aita4090/YRF/CRAFT-main/v5/data/valid/encoder_input.npz
+  template_id_vocab: /media/aita4090/YRF/CRAFT-main/v5/resources/template_id_vocab.json
+  template_roles: /media/aita4090/YRF/CRAFT-main/v5/resources/template_roles.json
+  smiles_vocab: /media/aita4090/YRF/CRAFT-main/v5/resources/smiles_vocab.json
+
+model:
+  atom_feat_dim: 32           # RDKit原子静态特征上限（自动截断/填充）
+  role_dim: 32                # 角色嵌入维
+  proj_dim: 256               # 节点+角色融合后投影维（GNN输入维）
+  gnn_hidden: 256
+  gnn_layers: 4
+  gat_heads: 8
+  gat_dropout: 0.1
+  edge_dim: 6                 # 新增：边特征维（bond_type4+conj1+ring1）
+
+  # 序列侧编码器（与解码器d_model对齐）
+  enc_num_layers: 2
+  enc_nhead: 8
+  enc_ffn: 1024
+  enc_dropout: 0.1
+
+  dec_d_model: 512
+  dec_nhead: 8
+  dec_num_layers: 6
+  dec_ffn: 2048
+  dec_dropout: 0.1
+  max_tgt_len: 256
+  tie_weights: true
+  tpl_dim: 512        # 模板全局嵌入维（通常与 dec_d_model 相同）
+  tpl_dropout: 0.1
+
+train:
+  batch_size: 64
+  lr: 3.0e-4
+  betas: [0.9, 0.99]
+  weight_decay: 0.01
+  warmup_steps: 4000
+  max_epochs: 80
+  grad_clip: 0.5
+  label_smoothing: 0.0
+  amp: false
+  seed: 42
+  log_interval: 100
+  ckpt_dir: checkpoints_v3
+  early_stop_patience: 5
+
+  plateau:
+    factor: 0.5
+    patience: 2
+    threshold: 1.0e-4
+    cooldown: 0
+    min_lr: 1.0e-7
+
+misc:
+  num_workers: 2
+  device: cuda     # auto/cuda/cpu
